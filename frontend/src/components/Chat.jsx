@@ -5,7 +5,7 @@ import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
 
 const Chat = ({ loading }) => {
-  const { prevChats, displayedMessages, setDisplayedMessages } = useContext(MyContext);
+  const { prevChats, newChat, displayedMessages, setDisplayedMessages } = useContext(MyContext);
   const chatEndRef = useRef(null);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const Chat = ({ loading }) => {
         ]);
         i++;
         if (i >= words.length) clearInterval(interval);
-      }, 40); 
+      }, 40);  
     } else {
       setDisplayedMessages(prevChats);
     }

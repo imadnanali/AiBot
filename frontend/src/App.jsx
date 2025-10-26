@@ -11,6 +11,7 @@ function App() {
   const [reply, setReply] = useState(null);
   const [currThreadId, setCurrThreadId] = useState(uuidv4())
   const [prevChats, setPrevChats] = useState([]);
+  const [newChat, setNewChat] = useState(true);
   const [allThreads, setAllThreads] = useState([]);
   const [displayedMessages, setDisplayedMessages] = useState([]);
 
@@ -18,6 +19,7 @@ function App() {
     prompt, setPrompt,
     reply, setReply,
     currThreadId, setCurrThreadId,
+    newChat, setNewChat,
     prevChats, setPrevChats,
     allThreads, setAllThreads,
     displayedMessages, setDisplayedMessages

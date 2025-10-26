@@ -12,10 +12,12 @@ const ChatWindow = () => {
     currThreadId,
     prevChats,
     setPrevChats,
+    setNewChat
   } = useContext(MyContext);
 
   const getReply = async () => {
     setPrompt("")
+    setNewChat(false)
     if (!prompt.trim()) return;
 
     setLoading(true);
