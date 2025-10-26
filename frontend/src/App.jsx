@@ -9,18 +9,25 @@ import { v4 as uuidv4 } from 'uuid';
 function App() {
   const [prompt, setPrompt] = useState("");
   const [reply, setReply] = useState(null);
-  const [ currThreadId, setCurrThreadId ] = useState(uuidv4())
+  const [currThreadId, setCurrThreadId] = useState(uuidv4())
+  const [prevChats, setPrevChats] = useState([]);
+  const [allThreads, setAllThreads] = useState([]);
+  const [displayedMessages, setDisplayedMessages] = useState([]);
+
   const providerValues = {
     prompt, setPrompt,
     reply, setReply,
-    currThreadId, setCurrThreadId
+    currThreadId, setCurrThreadId,
+    prevChats, setPrevChats,
+    allThreads, setAllThreads,
+    displayedMessages, setDisplayedMessages
   };
 
   return (
     <div className="flex">
       <MyContext.Provider value={providerValues}>
-      <SideBar />
-      <ChatWindow />
+        <SideBar />
+        <ChatWindow />
       </MyContext.Provider>
     </div>
   )
