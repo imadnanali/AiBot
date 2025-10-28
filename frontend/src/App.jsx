@@ -29,7 +29,7 @@ function App() {
   };
 
   return (
-    <div className="flex">
+    <div className="custom-scrollbar flex overflow-y-auto">
       <MyContext.Provider value={providerValues}>
         <SideBar />
         <ChatWindow />
