@@ -8,7 +8,7 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #333; /* scrollbar color */
+  background: #111111; /* scrollbar color */
   border-radius: 9999px; /* makes it rounded */
 }
 
@@ -19,5 +19,5 @@
 /* For Firefox */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #333 #0d0d0d;
+  scrollbar-color: #333 #111111;
 }
