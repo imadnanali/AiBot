@@ -4,7 +4,7 @@ import { MyContext } from "./MyContext.jsx";
 import { v4 as uuidv4 } from 'uuid';
 
 const SideBar = () => {
-  const { allThreads, setAllThreads, currThreadId, setReply, setPrompt, setCurrThreadId, setPrevChats, setNewChat } = useContext(MyContext);
+  const { allThreads, setAllThreads, currThreadId, setReply, setPrompt, setCurrThreadId, setPrevChats, setNewChat, setIsHistoryChat } = useContext(MyContext);
 
   const getAllThreads = async () => {
     try {
@@ -26,6 +26,7 @@ const SideBar = () => {
     setReply(null)
     setCurrThreadId(uuidv4());
     setPrevChats([]);
+    setNewChat(true)
   }
 
 
@@ -38,10 +39,23 @@ const SideBar = () => {
       setPrevChats(res);
       setNewChat(false)
       setReply(null)
+      setIsHistoryChat(true);
     } catch (err) {
       console.log(err)
     }
   }
+    
+    const deleteThread = async (threadId)=>{
+      const answer = confirm('Are you sure? you want to delete Thread?')
+      answer == true ?
+      await fetch(`http://localhost:8000/api/thread/${threadId}`, {method: 'DELETE'},
+        setAllThreads((prev)=>prev.filter(thread => thread.threadId !== threadId)))
+      .then(threadId === currThreadId && createNewChat)
+      .then(res => res.json()).then(data => console.log(data))
+      .catch(err => console.log(err, "Thread not Deleted")
+      ) : console.log("Thread not deleted — user cancelled.");
+    }
+    
 
   return (
     <div className="h-screen w-64 bg-[#111111] text-gray-200 flex flex-col border-r border-gray-800">
@@ -55,10 +69,9 @@ const SideBar = () => {
         <i className="fa-solid fa-pen-to-square h-6"></i>
       </div>
 
-      {/* New Chat Button - ADDED onClick HERE */}
       <div className="p-3">
         <button
-          onClick={createNewChat} // ← ADD THIS LINE
+          onClick={createNewChat}
           className="flex items-center justify-center gap-2 w-full bg-[#1a1a1a] cursor-pointer hover:bg-[#2a2a2a] text-white text-sm font-medium py-2.5 rounded-xl transition-all duration-200 shadow-sm border border-gray-700"
         >
           <svg
@@ -87,7 +100,7 @@ const SideBar = () => {
             {allThreads?.map((thread, index) => (
               <li key={index} onClick={(e) => getPrevThread(thread.threadId)}>
                 <button className="w-full text-left flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-[#1e1e1e] transition-all duration-150 group">
-                  <svg
+                  {/* <svg
                     className="w-4 h-4 text-gray-500 group-hover:text-gray-300"
                     fill="none"
                     stroke="currentColor"
@@ -99,23 +112,14 @@ const SideBar = () => {
                       strokeWidth={2}
                       d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                     />
-                  </svg>
+                  </svg> */}
                   <span className="text-sm text-gray-300 truncate flex-1">
                     {thread.title}
                   </span>
-                  <svg
-                    className="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                 <i className="fa-solid fa-trash opacity-0 group-hover:opacity-100 hover:text-red-600" onClick={(e)=>{
+                  e.stopPropagation();
+                  deleteThread(thread.threadId);
+                 }}></i>
                 </button>
               </li>
             ))}

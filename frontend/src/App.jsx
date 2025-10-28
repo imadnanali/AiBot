@@ -14,7 +14,9 @@ function App() {
   const [newChat, setNewChat] = useState(true);
   const [allThreads, setAllThreads] = useState([]);
   const [displayedMessages, setDisplayedMessages] = useState([]);
+  const [isHistoryChat, setIsHistoryChat] = useState(false)
 
+  
   const providerValues = {
     prompt, setPrompt,
     reply, setReply,
@@ -22,7 +24,8 @@ function App() {
     newChat, setNewChat,
     prevChats, setPrevChats,
     allThreads, setAllThreads,
-    displayedMessages, setDisplayedMessages
+    displayedMessages, setDisplayedMessages,
+    isHistoryChat, setIsHistoryChat
   };
 
   return (
