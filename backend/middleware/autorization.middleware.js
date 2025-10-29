@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken"
 import User from "../model/user.model.js"
 import "dotenv/config"
 
-const isAuthenticate = async(req, res, next) => {
+const isAuthenticate = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -13,12 +13,11 @@ const isAuthenticate = async(req, res, next) => {
             return res.status(403).json({ message: "Token is not provided" })
         }
         const decoded = jwt.verify(token, process.env.TOKEN_KEY)
-            if (!decoded) {
+        if (!decoded) {
             return res.status(403).json({ message: "User not found" })
         }
         const user = await User.findById(decoded.userId).select("-password")
         req.user = user
-        console.log(user)
         next()
 
     } catch (error) {

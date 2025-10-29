@@ -57,7 +57,7 @@ export const logIn = async (req, res) => {
     }
 }
 
-export const currUser = (req, res)=>{
+export const currUser = (req, res) => {
     const user = req.user
-    res.status(200).json({user})
+    res.status(200).json({ user })
 }
