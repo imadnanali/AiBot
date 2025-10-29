@@ -5,6 +5,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import Thread from "./model/thread.model.js";
 import mongoose from "mongoose";
 import chatRoute from "./routes/chat.route.js"
+import userRoute from "./routes/user.route.js"
 
 let dbConnect = async () => {
   try {
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api", chatRoute)
+app.use("/", userRoute)
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
