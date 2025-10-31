@@ -1,9 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 const AuthModal = ({ type, onClose }) => {
-  const navigate = useNavigate();
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -20,23 +18,18 @@ const AuthModal = ({ type, onClose }) => {
     const data = await response.json();
     
     if (response.ok) {
-      // ✅ FIX: Properly store token and user
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user)); // Stringify the user object
+      localStorage.setItem("user", JSON.stringify(data.user));
       
       console.log("Signup successful:", data.user);
       
-      // Clear form
       setName("");
       setEmail("");
       setPassword("");
-      
-      // Close modal
       onClose();
       
-      // ✅ Instead of reload, trigger auth context update
       setTimeout(() => {
-        window.location.reload(); // Keep this for now, but we'll improve it
+        window.location.reload();
       }, 100);
       
     } else {
@@ -61,9 +54,6 @@ const AuthModal = ({ type, onClose }) => {
     if (response.ok) {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      // navigate("/chat");
-
-      // ✅ close modal
       onClose();
       setEmail("");
       setPassword("");

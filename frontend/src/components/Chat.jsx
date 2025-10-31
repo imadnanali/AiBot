@@ -13,30 +13,26 @@ const Chat = ({ loading }) => {
   }, [displayedMessages, loading]);
 
   useEffect(() => {
-    // If it's a new chat, clear displayed messages
     if (newChat) {
       setDisplayedMessages([]);
       return;
     }
 
-    // If we're loading history chat, set displayed messages directly
     if (isHistoryChat && prevChats.length > 0) {
       setDisplayedMessages(prevChats);
       return;
     }
 
-    // For new messages with typing effect
     if (prevChats.length === 0) return;
     
     const lastMessage = prevChats[prevChats.length - 1];
 
     if (lastMessage.role === "assistant" && !isHistoryChat) {
-      // Typing effect for new AI responses
       let words = lastMessage.content.split(" ");
       let i = 0;
       const interval = setInterval(() => {
         setDisplayedMessages([
-          ...prevChats.slice(0, -1),
+          ...prevChats.slice(0, -1),  
           {
             ...lastMessage,
             content: words.slice(0, i + 1).join(" "),
@@ -47,7 +43,6 @@ const Chat = ({ loading }) => {
       }, 40);
       return () => clearInterval(interval);
     } else {
-      // For user messages or when loading history
       setDisplayedMessages(prevChats);
     }
   }, [prevChats, newChat, isHistoryChat]);

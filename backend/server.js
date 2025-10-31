@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import 'dotenv/config';
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import Thread from "./model/thread.model.js";
 import mongoose from "mongoose";
 import chatRoute from "./routes/chat.route.js"
 import userRoute from "./routes/user.route.js"
@@ -35,23 +34,6 @@ async function main(prompt) {
     console.error("Error in main():", error);
   }
 }
-
-app.post("/test", async (req, res) => {
-  try {
-    const { prompt } = req.body;
-    console.log(prompt);
-    let data = await main(prompt);
-    console.log(data, 'Ai response');
-    let newThread = new Thread({ thread: data });
-    await newThread.save();
-    console.log(newThread);
-
-    res.json({ response: data });
-  } catch (err) {
-    console.error("Error:", err);
-    res.status(500).send({ error: "Something went wrong" });
-  }
-});
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Server is running on port ${process.env.PORT || 3000}`);

@@ -18,42 +18,46 @@ const ChatWindow = () => {
   } = useContext(MyContext);
 
   const getReply = async () => {
-    setPrompt("")
-    setNewChat(false)
-    setIsHistoryChat(false);
-    if (!prompt.trim()) return;
+  setPrompt("")
+  setNewChat(false)
+  setIsHistoryChat(false);
+  if (!prompt.trim()) return;
 
-    setLoading(true);
-    const userMessage = { role: "user", content: prompt };
-    setPrevChats((prev) => [...prev, userMessage]);
+  setLoading(true);
+  setPrevChats((prev) => [...prev, { role: "user", content: prompt }]);
 
-    try {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        alert("Please login to send messages");
-        setLoading(false);
-        return;
-      }
-
-
-      const response = await fetch("http://localhost:8000/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ content: prompt, threadId: currThreadId }),
-      });
-      const res = await response.json();
-      setReply(res.reply);
-      getAllThreads()
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+  try {
+    const token = localStorage.getItem("token"); // Still get token but don't require it
+    
+    const response = await fetch("http://localhost:8000/api/chat", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        ...(token && { 'Authorization': `Bearer ${token}` }) // Only add auth header if token exists
+      },
+      body: JSON.stringify({ content: prompt, threadId: currThreadId }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  };
+    
+    const res = await response.json();
+    setReply(res.reply);
+    
+    // Only refresh threads if user is logged in (has token)
+    if (token) {
+      console.log("User logged in, refreshing threads...");
+      getAllThreads();
+    }
+    
+  } catch (err) {
+    console.error("Error sending message:", err);
+    alert("Failed to send message. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     if (reply) {

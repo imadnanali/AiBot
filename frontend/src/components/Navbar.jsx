@@ -14,17 +14,19 @@ const Navbar = () => {
         setIsOpen(!isOpen)
     }
 
-
     const handleLogout = () => {
-        logout();
-        setIsOpen(false);
-        window.location.reload();
+        const answer = confirm('Are you sure you want to logout?');
+        if (answer) {
+            logout();
+            setIsOpen(false);
+            window.location.reload();
+        }
     }
 
 
     return (
         <div>
-            <header className="flex items-center justify-between px-6 py-[10px] border-b border-gray-800 bg-[#111111]">
+            <header className="flex items-center justify-between px-6 py-[8px] border-b border-gray-800 bg-[#111111]">
                 <h1 className="text-lg font-semibold tracking-wide">AiBot</h1>
                 <div onClick={openProfile} className="flex items-center gap-2 cursor-pointer">
                     <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-xs font-bold text-white">
@@ -49,13 +51,12 @@ const Navbar = () => {
                             </div>
                             <div
                                 onClick={() => {
-                                    localStorage.removeItem("token");
-                                    setIsLoggedIn(false);
+                                    handleLogout()
                                 }}
                                 className="flex items-center gap-2 px-4 py-2 text-gray-200 hover:bg-[#404040] cursor-pointer transition"
                             >
                                 <i className="fa-solid fa-right-from-bracket text-gray-300"></i>
-                                <span  onClick={handleLogout}>Logout</span>
+                                <span>Logout</span>
                             </div>
                             <div className="flex items-center gap-2 px-4 py-2 text-gray-200 hover:bg-[#404040] cursor-pointer transition">
                                 <i className="fa-solid fa-cloud-arrow-up text-gray-300"></i>

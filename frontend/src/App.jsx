@@ -16,7 +16,6 @@ function App() {
   const [displayedMessages, setDisplayedMessages] = useState([]);
   const [isHistoryChat, setIsHistoryChat] = useState(false)
 
-  // ✅ ADD THIS FUNCTION
   const getAllThreads = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -59,7 +58,7 @@ function App() {
     allThreads, setAllThreads,
     displayedMessages, setDisplayedMessages,
     isHistoryChat, setIsHistoryChat,
-    getAllThreads // ✅ ADD THIS TO CONTEXT
+    getAllThreads
   };
 
   return (

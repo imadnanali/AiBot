@@ -5,16 +5,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { AuthContext } from "../context/AuthContext.jsx";
 
 const SideBar = () => {
-  const { allThreads, setAllThreads, currThreadId, setReply, setPrompt, setCurrThreadId, setPrevChats, setNewChat, setIsHistoryChat, getAllThreads } = useContext(MyContext);
+  const { allThreads, setAllThreads, currThreadId, setReply, setPrompt, setCurrThreadId, setPrevChats, setNewChat, setIsHistoryChat, getAllThreads, setDisplayedMessages } = useContext(MyContext);
   const { user } = useContext(AuthContext);
 
 
   useEffect(() => {
     if (user) {
-      console.log("User logged in, fetching threads...");
       getAllThreads();
     } else {
-      console.log("No user, clearing threads");
       setAllThreads([]);
     }
   }, [user, currThreadId]);
@@ -53,7 +51,6 @@ const SideBar = () => {
       }
 
       const res = await response.json();
-      console.log("Previous thread data:", res);
 
       setPrevChats(res);
       setDisplayedMessages(res);
@@ -71,7 +68,6 @@ const SideBar = () => {
 
     if (answer) {
       try {
-        // Get token from localStorage
         const token = localStorage.getItem("token");
 
         if (!token) {
@@ -79,7 +75,6 @@ const SideBar = () => {
           return;
         }
 
-        // Make DELETE request
         const response = await fetch(`http://localhost:8000/api/thread/${threadId}`, {
           method: 'DELETE',
           headers: {
@@ -94,10 +89,8 @@ const SideBar = () => {
         const data = await response.json();
         console.log("Delete response:", data);
 
-        // Update UI state
         setAllThreads((prev) => prev.filter(thread => thread.threadId !== threadId));
 
-        // If deleted thread is the current one, create new chat
         if (threadId === currThreadId) {
           createNewChat();
         }
@@ -114,13 +107,13 @@ const SideBar = () => {
   return (
     <div className="h-screen w-64 bg-[#111111] text-gray-200 flex flex-col border-r border-gray-800">
       {/* Header / Logo */}
-      <div className="py-3 flex items-center gap-44 border-b border-gray-800" onClick={createNewChat}>
+      <div className="py-3 flex items-center gap-36 border-b border-gray-800" onClick={createNewChat}>
         <img
           src="./src/assets/blacklogo.png"
           alt="AiBot logo"
           className="invert brightness-200 h-6"
         />
-        <i className="fa-solid fa-pen-to-square h-6"></i>
+        <i className="fa-solid fa-pen-to-square fa-xl"></i>
       </div>
 
       <div className="p-3">
@@ -148,7 +141,7 @@ const SideBar = () => {
         {/* Chat History */}
         <div className="flex-1 overflow-y-auto p-2">
           <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">
-            Today
+            History
           </div>
           <ul className="space-y-1">
             {allThreads?.map((thread, index) => (
