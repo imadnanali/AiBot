@@ -2,20 +2,22 @@ import React, { useEffect } from "react";
 import { useContext } from "react";
 import { MyContext } from "./MyContext.jsx";
 import { v4 as uuidv4 } from 'uuid';
+import { AuthContext } from "../context/AuthContext.jsx";
 
 const SideBar = () => {
-  const { allThreads, setAllThreads, currThreadId, setReply, setPrompt, setCurrThreadId, setPrevChats, setNewChat, setIsHistoryChat } = useContext(MyContext);
+  const { allThreads, setAllThreads, currThreadId, setReply, setPrompt, setCurrThreadId, setPrevChats, setNewChat, setIsHistoryChat, getAllThreads } = useContext(MyContext);
+  const { user } = useContext(AuthContext);
 
-  const getAllThreads = async () => {
-    try {
-      const response = await fetch("http://localhost:8000/api/thread");
-      const res = await response.json();
-      const filterData = res.map(thread => ({ threadId: thread.threadId, title: thread.title }));
-      setAllThreads(filterData)
-    } catch (err) {
-      console.log(err)
+
+  useEffect(() => {
+    if (user) {
+      console.log("User logged in, fetching threads...");
+      getAllThreads();
+    } else {
+      console.log("No user, clearing threads");
+      setAllThreads([]);
     }
-  }
+  }, [user, currThreadId]);
 
   useEffect(() => {
     getAllThreads();
@@ -31,31 +33,83 @@ const SideBar = () => {
 
 
   const getPrevThread = async (newThreadId) => {
-    setCurrThreadId(newThreadId);
     try {
-      const response = await fetch(`http://localhost:8000/api/thread/${newThreadId}`);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please login to view chat history");
+        return;
+      }
+
+      setCurrThreadId(newThreadId);
+
+      const response = await fetch(`http://localhost:8000/api/thread/${newThreadId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const res = await response.json();
-      console.log(res)
+      console.log("Previous thread data:", res);
+
       setPrevChats(res);
-      setNewChat(false)
-      setReply(null)
+      setDisplayedMessages(res);
+      setNewChat(false);
+      setReply(null);
       setIsHistoryChat(true);
     } catch (err) {
-      console.log(err)
+      console.log("Error fetching thread:", err);
+      setPrevChats([]);
+      setDisplayedMessages([]);
     }
   }
-
   const deleteThread = async (threadId) => {
-    const answer = confirm('Are you sure? you want to delete Thread?')
-    answer == true ?
-      await fetch(`http://localhost:8000/api/thread/${threadId}`, { method: 'DELETE' },
-        setAllThreads((prev) => prev.filter(thread => thread.threadId !== threadId)))
-        .then(threadId === currThreadId && createNewChat)
-        .then(res => res.json()).then(data => console.log(data))
-        .catch(err => console.log(err, "Thread not Deleted")
-        ) : console.log("Thread not deleted — user cancelled.");
-  }
+    const answer = confirm('Are you sure? you want to delete Thread?');
 
+    if (answer) {
+      try {
+        // Get token from localStorage
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          alert("Please login to delete threads");
+          return;
+        }
+
+        // Make DELETE request
+        const response = await fetch(`http://localhost:8000/api/thread/${threadId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete thread');
+        }
+
+        const data = await response.json();
+        console.log("Delete response:", data);
+
+        // Update UI state
+        setAllThreads((prev) => prev.filter(thread => thread.threadId !== threadId));
+
+        // If deleted thread is the current one, create new chat
+        if (threadId === currThreadId) {
+          createNewChat();
+        }
+
+      } catch (err) {
+        console.error("Thread not deleted:", err);
+        alert("Failed to delete thread. Please try again.");
+      }
+    } else {
+      console.log("Thread not deleted — user cancelled.");
+    }
+  }
 
   return (
     <div className="h-screen w-64 bg-[#111111] text-gray-200 flex flex-col border-r border-gray-800">
@@ -103,11 +157,11 @@ const SideBar = () => {
                 setCurrThreadId(thread.threadId)
               }}>
                 <button className={`w-full text-left flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-[#1e1e1e] transition-all duration-150 group ${currThreadId === thread.threadId && "bg-[#1e1e1e]"}`}  >
-                 
+
                   <span className="text-sm text-gray-300 truncate flex-1">
                     {thread.title}
                   </span>
-                  
+
                   <i className="fa-solid fa-trash opacity-0 group-hover:opacity-100 hover:text-red-600" onClick={(e) => {
                     e.stopPropagation();
                     deleteThread(thread.threadId);
@@ -121,13 +175,17 @@ const SideBar = () => {
       <div className="p-1 ps-4 border-t border-gray-800">
         <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1e1e1e] transition-all duration-150 cursor-pointer">
           <div className="w-9 h-9 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-xs font-bold text-white">
-            AA
+            {user ? (
+              user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()
+            ) : (
+              "U"
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-white truncate">
-              Adnan Ali
+              {user ? user.name || user.email : "Guest User"}
             </p>
-            <p className="text-xs text-gray-400 truncate">Free Account</p>
+            <p className="text-xs text-gray-400 truncate"> {user ? "Premium Account" : "Free Account"}</p>
           </div>
           <svg
             className="w-4 h-4 text-gray-400"

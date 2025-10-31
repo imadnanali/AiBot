@@ -1,37 +1,53 @@
 import React, { useContext, useEffect, useState } from "react";
 import Chat from "./Chat";
 import { MyContext } from "./MyContext.jsx";
+import Navbar from "./Navbar.jsx";
 
 const ChatWindow = () => {
   const [loading, setLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
   const {
     prompt,
     setPrompt,
     reply,
     setReply,
     currThreadId,
-    prevChats,
     setPrevChats,
-    setNewChat
+    setNewChat,
+    setIsHistoryChat,
+    getAllThreads
   } = useContext(MyContext);
 
   const getReply = async () => {
     setPrompt("")
     setNewChat(false)
+    setIsHistoryChat(false);
     if (!prompt.trim()) return;
 
     setLoading(true);
-    setPrevChats((prev) => [...prev, { role: "user", content: prompt }]);
+    const userMessage = { role: "user", content: prompt };
+    setPrevChats((prev) => [...prev, userMessage]);
 
     try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("Please login to send messages");
+        setLoading(false);
+        return;
+      }
+
+
       const response = await fetch("http://localhost:8000/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ content: prompt, threadId: currThreadId }),
       });
       const res = await response.json();
       setReply(res.reply);
+      getAllThreads()
     } catch (err) {
       console.error(err);
     } finally {
@@ -46,40 +62,14 @@ const ChatWindow = () => {
     }
   }, [reply]);
 
-  const openProfile = ()=>{
-    setIsOpen(!isOpen)
-  }
+
 
   return (
     <div className="flex flex-col h-screen w-full bg-[#0d0d0d] text-gray-200">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-[10px] border-b border-gray-800 bg-[#111111]">
-        <h1 className="text-lg font-semibold tracking-wide">AiBot</h1>
-        <div onClick={openProfile}>
-        <i className="fa-solid fa-circle-user fa-xl cursor-pointer" ></i>
-        </div>
-      </header>
-      {isOpen && (
-  <div className="absolute right-12 top-12 w-40 bg-[#323232] rounded-xl shadow-lg overflow-hidden border border-gray-700">
-    <div className="flex items-center gap-2 px-4 py-2 text-gray-200 hover:bg-[#404040] cursor-pointer transition">
-      <i className="fa-solid fa-gear text-gray-300"></i>
-      <span>Settings</span>
-    </div>
-    <div className="flex items-center gap-2 px-4 py-2 text-gray-200 hover:bg-[#404040] cursor-pointer transition">
-      <i className="fa-solid fa-right-from-bracket text-gray-300"></i>
-      <span>Logout</span>
-    </div>
-    <div className="flex items-center gap-2 px-4 py-2 text-gray-200 hover:bg-[#404040] cursor-pointer transition">
-      <i className="fa-solid fa-cloud-arrow-up text-gray-300"></i>
-      <span>Upgrade</span>
-    </div>
-  </div>
-)}
-
-
+      <Navbar />
       {/* Chat Section */}
       <Chat loading={loading} />
-
       {/* Input Section */}
       <footer className="fixed bottom-0 w-full bg-[#111111]">
         <div className="max-w-[693px] mx-auto relative right-[173px]">

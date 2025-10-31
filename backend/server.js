@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api", chatRoute)
-app.use("/", userRoute)
+app.use("/api/auth", userRoute)
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 

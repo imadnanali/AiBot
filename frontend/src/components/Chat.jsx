@@ -13,15 +13,25 @@ const Chat = ({ loading }) => {
   }, [displayedMessages, loading]);
 
   useEffect(() => {
+    // If it's a new chat, clear displayed messages
+    if (newChat) {
+      setDisplayedMessages([]);
+      return;
+    }
+
+    // If we're loading history chat, set displayed messages directly
+    if (isHistoryChat && prevChats.length > 0) {
+      setDisplayedMessages(prevChats);
+      return;
+    }
+
+    // For new messages with typing effect
     if (prevChats.length === 0) return;
+    
     const lastMessage = prevChats[prevChats.length - 1];
 
-      if(isHistoryChat){
-        setDisplayedMessages(prevChats)
-        return
-      }
-
-    if (lastMessage.role === "assistant") {
+    if (lastMessage.role === "assistant" && !isHistoryChat) {
+      // Typing effect for new AI responses
       let words = lastMessage.content.split(" ");
       let i = 0;
       const interval = setInterval(() => {
@@ -37,15 +47,16 @@ const Chat = ({ loading }) => {
       }, 40);
       return () => clearInterval(interval);
     } else {
+      // For user messages or when loading history
       setDisplayedMessages(prevChats);
     }
-  }, [prevChats, isHistoryChat]);
+  }, [prevChats, newChat, isHistoryChat]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar bg-[#111111]  text-gray-200 pb-36">
+    <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar bg-[#111111] text-gray-200 pb-36">
       <div className="max-w-3xl mx-auto space-y-6">
         
-        {((displayedMessages.length === 0) || (newChat === true)) ? (
+        {displayedMessages.length === 0 && newChat ? (
           <div className="flex flex-col items-center justify-center text-center h-[366px]">
             <div className="w-16 h-16 mb-5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
               <img
@@ -58,7 +69,7 @@ const Chat = ({ loading }) => {
               Where should we begin?
             </h2>
             <p className="text-gray-400 text-base mb-8">
-              Ask me anything and I’ll help you find the answers you need.
+              Ask me anything and I'll help you find the answers you need.
             </p>
           </div>
         ) : (
@@ -81,7 +92,14 @@ const Chat = ({ loading }) => {
               {/* AI Message */}
               {chat.role === "assistant" && (
                 <div className="flex gap-3 max-w-[90%]">
-                  <div className="rounded-2xl px-4 py-3 text-sm text-white leading-6 bg-[#1a1a1a]">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <img
+                      src="./src/assets/blacklogo.png"
+                      alt="AI Bot logo"
+                      className="invert h-4"
+                    />
+                  </div>
+                  <div className="bg-[#1a1a1a] rounded-2xl px-4 py-3 text-sm text-white leading-6">
                     <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
                       {chat.content}
                     </ReactMarkdown>
@@ -95,9 +113,22 @@ const Chat = ({ loading }) => {
         {/* Loading dots*/}
         {loading && (
           <div className="flex justify-start items-center space-x-2 ml-1">
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150" />
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-300" />
+            <div className="flex gap-3 max-w-[90%]">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <img
+                  src="./src/assets/blacklogo.png"
+                  alt="AI Bot logo"
+                  className="invert h-4"
+                />
+              </div>
+              <div className="bg-[#1a1a1a] rounded-2xl px-4 py-3 text-sm text-white leading-6">
+                <div className="flex space-x-2">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150" />
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-300" />
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
