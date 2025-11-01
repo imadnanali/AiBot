@@ -27,7 +27,7 @@ const Navbar = () => {
     return (
         <div>
             <header className="flex items-center justify-between px-6 py-[8px] border-b border-gray-800 bg-[#111111]">
-                <h1 className="text-lg font-semibold tracking-wide">AiBot</h1>
+                <h1 className="text-lg font-semibold tracking-wide">GemAi</h1>
                 <div onClick={openProfile} className="flex items-center gap-2 cursor-pointer">
                     <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-xs font-bold text-white">
                         {user ? (

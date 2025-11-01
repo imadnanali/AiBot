@@ -87,13 +87,7 @@ const Chat = ({ loading }) => {
               {/* AI Message */}
               {chat.role === "assistant" && (
                 <div className="flex gap-3 max-w-[90%]">
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <img
-                      src="./src/assets/blacklogo.png"
-                      alt="AI Bot logo"
-                      className="invert h-4"
-                    />
-                  </div>
+                  
                   <div className="bg-[#1a1a1a] rounded-2xl px-4 py-3 text-sm text-white leading-6">
                     <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
                       {chat.content}
